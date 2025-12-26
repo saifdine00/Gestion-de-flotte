@@ -1,0 +1,374 @@
+/* ============================================
+   MODERN 2025 DESIGN ENHANCEMENTS
+   Add this file to your _Layout.cshtml after site.css
+   ============================================ */
+
+/* ========== CSS CUSTOM PROPERTIES ========== */
+:root {
+    /* Modern Color Palette - Light Mode */
+    --color-primary: #6366f1;
+    --color-primary-hover: #4f46e5;
+    --color-secondary: #8b5cf6;
+    --color-accent: #06b6d4;
+    --color-success: #10b981;
+    --color-warning: #f59e0b;
+    --color-danger: #ef4444;
+
+    /* Glassmorphism Colors */
+    --glass-bg-light: rgba(255, 255, 255, 0.85);
+    --glass-bg-dark: rgba(30, 30, 30, 0.85);
+    --glass-border-light: rgba(255, 255, 255, 0.3);
+    --glass-border-dark: rgba(255, 255, 255, 0.1);
+
+    /* Modern Shadows */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+    --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.16);
+    --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.3);
+
+    /* Spacing */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 1.5rem;
+    --spacing-lg: 2rem;
+    --spacing-xl: 3rem;
+
+    /* Border Radius */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+    --radius-full: 9999px;
+
+    /* Transitions */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ========== ENHANCED GLASSMORPHISM ========== */
+html[data-bs-theme="dark"] .frosted {
+    background: linear-gradient(135deg, rgba(30, 30, 30, 0.9) 0%, rgba(20, 20, 20, 0.85) 100%);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--glass-border-dark);
+    box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+html[data-bs-theme="light"] .frosted {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(250, 250, 250, 0.85) 100%);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--glass-border-light);
+    box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+/* ========== MODERN CARDS ========== */
+.card {
+    border-radius: var(--radius-lg);
+    border: 1px solid transparent;
+    background: var(--bs-card-bg);
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-base);
+    overflow: hidden;
+    position: relative;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+    opacity: 0;
+    transition: opacity var(--transition-base);
+}
+
+.card:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: var(--shadow-xl), var(--shadow-glow);
+    border-color: rgba(99, 102, 241, 0.2);
+}
+
+.card:hover::before {
+    opacity: 1;
+}
+
+/* ========== MODERN BUTTONS ========== */
+.btn {
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    padding: 0.625rem 1.25rem;
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+    border: none;
+    box-shadow: var(--shadow-md);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg), 0 0 20px rgba(99, 102, 241, 0.4);
+}
+
+/* ========== MODERN NAVBAR ========== */
+.lubelogger-navbar-container {
+    box-shadow: var(--shadow-md);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.lubelogger-tab .nav-link {
+    border-radius: var(--radius-md);
+    margin: 0 0.25rem;
+    padding: 0.625rem 1rem;
+    transition: all var(--transition-base);
+    position: relative;
+}
+
+.lubelogger-tab .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+    border-radius: var(--radius-full);
+    transform: translateX(-50%);
+    transition: width var(--transition-base);
+}
+
+.lubelogger-tab .nav-link:hover {
+    background: rgba(99, 102, 241, 0.1);
+    transform: translateY(-2px);
+}
+
+.lubelogger-tab .nav-link.active {
+    background: rgba(99, 102, 241, 0.15);
+    color: var(--color-primary);
+}
+
+.lubelogger-tab .nav-link.active::after {
+    width: 60%;
+}
+
+/* ========== MODERN INPUTS ========== */
+.form-control,
+.form-select {
+    border-radius: var(--radius-md);
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    padding: 0.75rem 1rem;
+    transition: all var(--transition-base);
+    background: var(--bs-body-bg);
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1), var(--shadow-md);
+    transform: translateY(-1px);
+}
+
+/* ========== MODERN TABLES ========== */
+.table {
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.table thead {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+}
+
+.table tbody tr {
+    transition: all var(--transition-fast);
+}
+
+.table tbody tr:hover {
+    background: rgba(99, 102, 241, 0.05);
+    transform: scale(1.01);
+    box-shadow: var(--shadow-sm);
+}
+
+/* ========== MODERN MODALS ========== */
+.modal-content {
+    border-radius: var(--radius-xl);
+    border: none;
+    box-shadow: var(--shadow-xl);
+    overflow: hidden;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding: var(--spacing-md);
+}
+
+.modal-body {
+    padding: var(--spacing-lg);
+}
+
+/* ========== SMOOTH SCROLLING ========== */
+html {
+    scroll-behavior: smooth;
+}
+
+/* ========== MODERN BADGES ========== */
+.badge {
+    border-radius: var(--radius-full);
+    padding: 0.375rem 0.75rem;
+    font-weight: 500;
+    box-shadow: var(--shadow-sm);
+}
+
+/* ========== ENHANCED ANIMATIONS ========== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+/* ========== MODERN DROPDOWNS ========== */
+.dropdown-menu {
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-xl);
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.dropdown-item {
+    border-radius: var(--radius-md);
+    padding: 0.625rem 1rem;
+    margin: 0.125rem 0;
+    transition: all var(--transition-fast);
+}
+
+.dropdown-item:hover {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+    transform: translateX(4px);
+}
+
+/* ========== MODERN TASK CARDS ========== */
+.taskCard {
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-base);
+    padding: var(--spacing-md);
+}
+
+.taskCard:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: var(--shadow-xl);
+}
+
+/* ========== GRADIENT BACKGROUNDS ========== */
+html[data-bs-theme="dark"] body {
+    background: radial-gradient(ellipse at top, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse at bottom, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+        var(--bs-body-bg);
+}
+
+html[data-bs-theme="light"] body {
+    background: radial-gradient(ellipse at top, rgba(99, 102, 241, 0.05) 0%, transparent 50%),
+        radial-gradient(ellipse at bottom, rgba(139, 92, 246, 0.05) 0%, transparent 50%),
+        var(--bs-body-bg);
+}
+
+/* ========== MODERN LOADING STATES ========== */
+.loading-shimmer {
+    background: linear-gradient(90deg,
+            rgba(0, 0, 0, 0.05) 0%,
+            rgba(0, 0, 0, 0.1) 50%,
+            rgba(0, 0, 0, 0.05) 100%);
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite;
+}
+
+/* ========== RESPONSIVE IMPROVEMENTS ========== */
+@media (max-width: 768px) {
+    .card {
+        border-radius: var(--radius-md);
+    }
+
+    .modal-content {
+        border-radius: var(--radius-lg);
+        margin: 1rem;
+    }
+}
+
+/* ========== ACCESSIBILITY ENHANCEMENTS ========== */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ========== FOCUS STATES ========== */
+*:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+}

@@ -1,0 +1,90 @@
+﻿@using CarCareTracker.Helper
+@inject IConfigHelper config
+@inject ITranslationHelper translator
+@{
+    var userConfig = config.GetUserConfig(User);
+    var userLanguage = userConfig.UserLanguage;
+}
+@model VehicleCollaboratorViewModel
+<div class="row">
+    <div class="@(Model.CanModifyCollaborators ? "col-8" : "col-12")">
+        <span class="lead">@translator.Translate(userLanguage, "Collaborators")</span>
+    </div>
+    @if (Model.CanModifyCollaborators)
+    {
+        <div class="col-4">
+            <button onclick="addCollaborator()" class="btn btn-link btn-sm"><i class="bi bi-person-add"></i></button>
+        </div>
+    }
+</div>
+<div class="row">
+    <table class="table table-hover">
+        <thead>
+            <tr class="d-flex">
+                <th scope="col" class="@(Model.CanModifyCollaborators ? "col-8" : "col-12")">@translator.Translate(userLanguage, "Username")</th>
+                @if (Model.CanModifyCollaborators)
+                {
+                    <th scope="col" class="col-4">@translator.Translate(userLanguage, "Delete")</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (UserCollaborator user in Model.Collaborators)
+            {
+                <tr class="d-flex">
+                    <td class="@(Model.CanModifyCollaborators ? "col-8" : "col-12")">@user.UserName</td>
+                    @if (Model.CanModifyCollaborators)
+                    {
+                        <td class="col-4">
+                            @if (User.Identity.Name != user.UserName && Model.CanModifyCollaborators)
+                            {
+                                <button onclick="deleteCollaborator(@user.UserVehicle.UserId, @user.UserVehicle.VehicleId)" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></button>
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<script>
+    function deleteCollaborator(userId, vehicleId) {
+        $.post('/Vehicle/DeleteCollaboratorFromVehicle', {userId: userId, vehicleId: vehicleId}, function(data){
+            if (data) {
+                successToast('Collaborator Removed');
+                refreshCollaborators();
+            } else {
+                errorToast(genericErrorMessage());
+            }
+        })
+    }
+    function addCollaborator() {
+        Swal.fire({
+            title: 'Add Collaborator',
+            html: `
+                            <input type="text" id="inputUserName" class="swal2-input" placeholder="Username" onkeydown="handleSwalEnter(event)">
+                            `,
+            confirmButtonText: 'Add',
+            focusConfirm: false,
+            preConfirm: () => {
+                const userName = $("#inputUserName").val();
+                if (!userName) {
+                    Swal.showValidationMessage(`Please enter a username`);
+                }
+                return { userName }
+            },
+        }).then(function (result) {
+            if (result.isConfirmed) {
+                var vehicleId = GetVehicleId().vehicleId;
+                $.post('/Vehicle/AddCollaboratorsToVehicle', { username: result.value.userName, vehicleId: vehicleId }, function (data) {
+                    if (data.success) {
+                        successToast(data.message);
+                        refreshCollaborators();
+                    } else {
+                        errorToast(data.message)
+                    }
+                });
+            }
+        });
+    }
+</script>

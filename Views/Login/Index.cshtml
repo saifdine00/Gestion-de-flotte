@@ -1,0 +1,615 @@
+﻿@using CarCareTracker.Helper
+@inject IConfigHelper config
+@inject ITranslationHelper translator
+@model string
+@{
+    var userLanguage = config.GetServerLanguage();
+    var registrationDisabled = config.GetServerDisabledRegistration();
+    var openIdConfigName = config.GetOpenIDConfig().Name;
+}
+@{
+    ViewData["Title"] = "Login";
+}
+@section Scripts {
+    <script src="~/js/login.js?v=@StaticHelper.VersionNumber"></script>
+}
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .login-wrapper {
+        min-height: 100vh;
+        display: flex;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        overflow: hidden;
+    }
+
+    /* Section gauche - Design visuel */
+    .login-visual {
+        flex: 1;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        background-size: 400% 400%;
+        animation: gradientShift 15s ease infinite;
+        position: relative;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+        overflow: hidden;
+    }
+
+    @@keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .login-visual::before {
+        content: '';
+        position: absolute;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 2px, transparent 2px);
+        background-size: 60px 60px;
+        animation: floatPattern 30s linear infinite;
+        opacity: 0.6;
+    }
+
+    @@keyframes floatPattern {
+        0% { transform: translate(0, 0) rotate(0deg); }
+        100% { transform: translate(60px, 60px) rotate(360deg); }
+    }
+
+    .login-visual-content {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        color: white;
+        max-width: 500px;
+    }
+
+    .login-visual-logo {
+        max-width: 280px;
+        height: auto;
+        margin-bottom: 30px;
+        filter: drop-shadow(0 10px 30px rgba(0,0,0,0.3));
+        animation: logoFloat 3s ease-in-out infinite;
+    }
+
+    @@keyframes logoFloat {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+
+    .login-visual-title {
+        font-size: 42px;
+        font-weight: 700;
+        margin-bottom: 15px;
+        text-shadow: 0 2px 20px rgba(0,0,0,0.2);
+    }
+
+    .login-visual-subtitle {
+        font-size: 18px;
+        opacity: 0.95;
+        line-height: 1.6;
+    }
+
+    /* Section droite - Formulaire */
+    .login-form-section {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+        background: #f8f9fa;
+        position: relative;
+    }
+
+    .login-form-container {
+        width: 100%;
+        max-width: 440px;
+        animation: slideInRight 0.6s ease-out;
+    }
+
+    @@keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .login-form-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .login-form-logo {
+        max-width: 200px;
+        height: auto;
+        margin-bottom: 20px;
+        display: none;
+    }
+
+    .login-form-title {
+        font-size: 32px;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 8px;
+        letter-spacing: -0.5px;
+    }
+
+    .login-form-subtitle {
+        font-size: 15px;
+        color: #6b7280;
+        font-weight: 400;
+    }
+
+    .login-form {
+        background: white;
+        padding: 40px;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        border: 1px solid #e5e7eb;
+    }
+
+    .form-field {
+        margin-bottom: 24px;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 8px;
+    }
+
+    .form-input-wrapper {
+        position: relative;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 14px 16px;
+        font-size: 15px;
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        background: #fff;
+        transition: all 0.2s ease;
+        color: #1a1a1a;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-input::placeholder {
+        color: #9ca3af;
+    }
+
+    .password-toggle-btn {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #6b7280;
+        cursor: pointer;
+        padding: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: color 0.2s ease;
+        z-index: 10;
+    }
+
+    .password-toggle-btn:hover {
+        color: #667eea;
+    }
+
+    .form-check-wrapper {
+        display: flex;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+
+    .form-check-input {
+        width: 18px;
+        height: 18px;
+        margin-right: 10px;
+        cursor: pointer;
+        accent-color: #667eea;
+    }
+
+    .form-check-label {
+        font-size: 14px;
+        color: #6b7280;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .btn-login {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 14px 0 rgba(102, 126, 234, 0.39);
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .btn-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px 0 rgba(102, 126, 234, 0.5);
+    }
+
+    .btn-login:active {
+        transform: translateY(0);
+    }
+
+    .btn-login:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .btn-oidc {
+        width: 100%;
+        padding: 12px;
+        background: white;
+        color: #374151;
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .btn-oidc:hover {
+        background: #f9fafb;
+        border-color: #d1d5db;
+    }
+
+    .divider {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        margin: 24px 0;
+        color: #9ca3af;
+        font-size: 13px;
+    }
+
+    .divider::before,
+    .divider::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .divider::before {
+        margin-right: 12px;
+    }
+
+    .divider::after {
+        margin-left: 12px;
+    }
+
+    .login-motd {
+        text-align: center;
+        padding: 16px;
+        background: #f3f4f6;
+        border-radius: 10px;
+        margin: 20px 0;
+        font-size: 13px;
+        color: #6b7280;
+        font-style: italic;
+        line-height: 1.5;
+    }
+
+    .login-links {
+        text-align: center;
+        margin-top: 24px;
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .login-link {
+        color: #667eea;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: color 0.2s ease;
+    }
+
+    .login-link:hover {
+        color: #764ba2;
+        text-decoration: underline;
+    }
+
+    .login-link-separator {
+        color: #d1d5db;
+    }
+
+    /* Responsive Design */
+    @@media (min-width: 1024px) {
+        .login-visual {
+            display: flex;
+        }
+        
+        .login-form-logo {
+            display: none;
+        }
+    }
+
+    @@media (max-width: 1023px) {
+        .login-wrapper {
+            flex-direction: column;
+        }
+
+        .login-visual {
+            display: none;
+        }
+
+        .login-form-section {
+            padding: 30px 20px;
+        }
+
+        .login-form {
+            padding: 30px 24px;
+        }
+
+        .login-form-logo {
+            display: block;
+        }
+
+        .login-form-title {
+            font-size: 28px;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .login-form-section {
+            padding: 20px 16px;
+        }
+
+        .login-form {
+            padding: 24px 20px;
+        }
+
+        .login-form-title {
+            font-size: 24px;
+        }
+
+        .login-visual-title {
+            font-size: 32px;
+        }
+    }
+
+    /* Loading state */
+    .btn-login.loading {
+        position: relative;
+        color: transparent;
+    }
+
+    .btn-login.loading::after {
+        content: '';
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        top: 50%;
+        left: 50%;
+        margin-left: -10px;
+        margin-top: -10px;
+        border: 2px solid #ffffff;
+        border-radius: 50%;
+        border-top-color: transparent;
+        animation: spin 0.8s linear infinite;
+    }
+
+    @@keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+</style>
+
+<div class="login-wrapper">
+    <!-- Section visuelle (desktop seulement) -->
+    <div class="login-visual">
+        <div class="login-visual-content">
+            <img src="@config.GetLogoUrl()?v=@StaticHelper.VersionNumber" class="login-visual-logo" alt="GestionFlotte" />
+            <h1 class="login-visual-title">Bienvenue sur GestionFlotte</h1>
+            <p class="login-visual-subtitle">
+                Gérez votre flotte de véhicules de manière simple et efficace. 
+                Suivez l'entretien, les coûts et bien plus encore.
+            </p>
+        </div>
+    </div>
+
+    <!-- Section formulaire -->
+    <div class="login-form-section">
+        <div class="login-form-container">
+            <div class="login-form-header">
+                <img src="@config.GetLogoUrl()?v=@StaticHelper.VersionNumber" class="login-form-logo" alt="GestionFlotte" />
+                <h1 class="login-form-title">Connexion</h1>
+                <p class="login-form-subtitle">Accédez à votre compte GestionFlotte</p>
+            </div>
+
+            <div class="login-form">
+                <form onsubmit="event.preventDefault(); performLogin();">
+                    <div class="form-field">
+                        <label for="inputUserName" class="form-label">
+                            @translator.Translate(userLanguage, "Username")
+                        </label>
+                        <div class="form-input-wrapper">
+                            <input 
+                                type="text" 
+                                id="inputUserName" 
+                                class="form-input" 
+                                placeholder="@translator.Translate(userLanguage, "Enter your username")"
+                                autocomplete="username"
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="inputUserPassword" class="form-label">
+                            @translator.Translate(userLanguage, "Password")
+                        </label>
+                        <div class="form-input-wrapper">
+                            <input 
+                                type="password" 
+                                id="inputUserPassword" 
+                                class="form-input" 
+                                placeholder="@translator.Translate(userLanguage, "Enter your password")"
+                                onkeyup="callBackOnEnter(event, performLogin)"
+                                autocomplete="current-password"
+                                required
+                            />
+                            <button 
+                                type="button" 
+                                class="password-toggle-btn" 
+                                onclick="togglePasswordVisibilityLogin(this)"
+                                aria-label="Toggle password visibility"
+                            >
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-check-wrapper">
+                        <input 
+                            class="form-check-input" 
+                            type="checkbox" 
+                            id="inputPersistent"
+                        />
+                        <label class="form-check-label" for="inputPersistent">
+                            @translator.Translate(userLanguage, "Remember Me")
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn-login" id="loginButton">
+                        <i class="bi bi-box-arrow-in-right"></i>
+                        <span>@translator.Translate(userLanguage, "Login")</span>
+                    </button>
+
+                    @if (!string.IsNullOrWhiteSpace(openIdConfigName))
+                    {
+                        <div class="divider">@translator.Translate(userLanguage, "or")</div>
+                        <button type="button" class="btn-oidc" onclick="remoteLogin()">
+                            <i class="bi bi-box-arrow-in-right"></i>
+                            <span>@($"{translator.Translate(userLanguage, "Login via")} {openIdConfigName}")</span>
+                        </button>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(config.GetMOTD()))
+                    {
+                        <div class="login-motd">
+                            @config.GetMOTD()
+                        </div>
+                    }
+                </form>
+
+                <div class="login-links">
+                    <a href="/Login/ForgotPassword" class="login-link">
+                        @translator.Translate(userLanguage, "Forgot Password")
+                    </a>
+                    @if (!registrationDisabled)
+                    {
+                        <span class="login-link-separator">•</span>
+                        <a href="/Login/Registration" class="login-link">
+                            @translator.Translate(userLanguage, "Register")
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function getRedirectURL() {
+        return { url: decodeHTMLEntities('@Model') };
+    }
+
+    // Fonction personnalisée pour la page de login
+    function togglePasswordVisibilityLogin(button) {
+        const passwordInput = document.getElementById('inputUserPassword');
+        const icon = button.querySelector('i');
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            icon.classList.remove('bi-eye');
+            icon.classList.add('bi-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            icon.classList.remove('bi-eye-slash');
+            icon.classList.add('bi-eye');
+        }
+    }
+
+    // Ajout d'un état de chargement au bouton de connexion
+    const originalPerformLogin = window.performLogin;
+    if (typeof originalPerformLogin === 'undefined') {
+        // Si performLogin n'existe pas encore, on attend qu'il soit chargé
+        document.addEventListener('DOMContentLoaded', function() {
+            setupLoginButton();
+        });
+    } else {
+        setupLoginButton();
+    }
+
+    function setupLoginButton() {
+        const loginButton = document.getElementById('loginButton');
+        const loginForm = document.querySelector('.login-form form');
+        
+        if (loginForm) {
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                if (loginButton) {
+                    loginButton.classList.add('loading');
+                    loginButton.disabled = true;
+                }
+                
+                // Appeler performLogin et réinitialiser le bouton après un délai
+                if (typeof performLogin === 'function') {
+                    performLogin();
+                    // Réinitialiser après 3 secondes au cas où
+                    setTimeout(() => {
+                        if (loginButton) {
+                            loginButton.classList.remove('loading');
+                            loginButton.disabled = false;
+                        }
+                    }, 3000);
+                }
+            });
+        }
+    }
+</script>
