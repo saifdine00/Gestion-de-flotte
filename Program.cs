@@ -203,6 +203,10 @@ app.UseRouting();
 
 app.UseAuthorization();
 
+// Healthcheck endpoint for Railway (no authentication required)
+app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }));
+app.MapGet("/", () => Results.Ok(new { status = "healthy", message = "GestionFlotte API is running" }));
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

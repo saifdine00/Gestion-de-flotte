@@ -4,7 +4,7 @@ buildCommand = "dotnet publish -c Release -o ./publish"
 
 [deploy]
 startCommand = "dotnet ./publish/CarCareTracker.dll"
-healthcheckPath = "/"
+healthcheckPath = "/health"
 healthcheckTimeout = 100
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 10
