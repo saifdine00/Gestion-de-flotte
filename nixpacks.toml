@@ -2,5 +2,5 @@
 nixPkgs = []
 
 [start]
-cmd = "dotnet CarCareTracker.dll"
+cmd = "/App/start.sh"
 
