@@ -10,5 +10,6 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /App
 COPY --from=build-env /App/out .
 EXPOSE 8080
-ENV ASPNETCORE_URLS=http://0.0.0.0:${PORT:-8080}
+# Don't set ASPNETCORE_URLS here - let Program.cs handle it
+# Railway will inject PORT automatically
 ENTRYPOINT ["dotnet", "CarCareTracker.dll"]
