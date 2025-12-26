@@ -1,0 +1,6 @@
+[phases.setup]
+nixPkgs = []
+
+[start]
+cmd = "dotnet CarCareTracker.dll"
+
