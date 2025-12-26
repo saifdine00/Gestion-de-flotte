@@ -10,4 +10,5 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /App
 COPY --from=build-env /App/out .
 EXPOSE 8080
-CMD ["./CarCareTracker"]
+ENV ASPNETCORE_URLS=http://0.0.0.0:${PORT:-8080}
+ENTRYPOINT ["dotnet", "CarCareTracker.dll"]
